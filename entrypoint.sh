@@ -10,6 +10,8 @@ PG_PORT=5432
 PG_USER="${DB_USER}"
 PG_DB="${DB_NAME}"
 
+PORT="${PORT:-8000}"
+
 echo "[entrypoint] Starting container initialization..."
 
 echo "[entrypoint] Checking database availability at ${PG_HOST}:${PG_PORT}..."
