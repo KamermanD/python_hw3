@@ -27,6 +27,8 @@ echo "[entrypoint] Applying migrations..."
 alembic upgrade head
 echo "[entrypoint] Migrations successfully applied"
 
-# Run main process
-echo "[entrypoint] Launching application: $@"
-exec "$@"
+echo "[entrypoint] Launching application: gunicorn src.main:app --workers 1 --worker-class uvicorn.workers.UvicornWorker --bind 0.0.0.0:${PORT}"
+exec gunicorn src.main:app \
+     --workers 1 \
+     --worker-class uvicorn.workers.UvicornWorker \
+     --bind 0.0.0.0:${PORT}
