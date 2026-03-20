@@ -1,0 +1,65 @@
+
+volumes:
+  postgres_prod_data:
+  redis_data:
+services:
+  db:
+    image: postgres:16
+    container_name: db_app
+    environment:
+      POSTGRES_USER: ${DB_USER}     
+      POSTGRES_PASSWORD: ${DB_PASS}  
+      POSTGRES_DB: ${DB_NAME}        
+      # POSTGRES_PORT: ${DB_PORT}    
+    ports:
+      - 5433:5432  
+    volumes:
+      - postgres_prod_data:/var/lib/postgresql/data/ 
+    restart: "no"
+    healthcheck: 
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: redis_app
+    restart: always
+    # environment:
+    #   - REDIS_PASSWORD=${REDIS_PASSWORD}
+    # command: --requirepass ${REDIS_PASSWORD}
+    ports:
+      - 6380:6379 
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build: . 
+    container_name: fastapi_app
+    stop_signal: SIGINT
+    environment:  
+      - DB_HOST=db 
+      - DB_PORT=${DB_PORT}
+      - DB_USER=${DB_USER}
+      - DB_PASS=${DB_PASS}
+      - DB_NAME=${DB_NAME}
+      - REDIS_HOST=redis 
+      - REDIS_PORT=${REDIS_PORT}
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+      - LOG_LEVEL=DEBUG 
+    ports:
+      - 80:8000
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      db:
+        condition: service_healthy 
+      redis:
+        condition: service_started
+    restart: "no"

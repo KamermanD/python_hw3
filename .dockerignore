@@ -1,0 +1,27 @@
+# Исключаем директории
+.git/
+.pytest_cache/
+.venv/
+.vscode/
+docs/
+htmlcov/ # Результаты покрытия тестами
+logs/
+tests/
+# Исключаем файлы из корня (добавьте/удалите по необходимости)
+.dockerignore # Сам файл .dockerignore не нужен в образе
+*.env # Обычно передаются через docker-compose, не запекаются в образ
+.gitignore
+depends.py
+pytest.ini
+requirements-dev.txt
+
+# Добавьте другие файлы, специфичные для вашего проекта, которые не нужны в образе 
+__pycache__/
+venv/
+env/
+*.pyc
+*.pyo
+*.pyd
+*.log
+README.md
+LICENSE
